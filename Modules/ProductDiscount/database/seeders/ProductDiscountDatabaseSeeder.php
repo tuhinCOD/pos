@@ -1,0 +1,16 @@
+<?php
+
+namespace Modules\ProductDiscount\Database\Seeders;
+
+use Illuminate\Database\Seeder;
+
+class ProductDiscountDatabaseSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        // $this->call([]);
+    }
+}

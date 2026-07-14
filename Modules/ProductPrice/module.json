@@ -1,0 +1,11 @@
+{
+    "name": "ProductPrice",
+    "alias": "productprice",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\ProductPrice\\Providers\\ProductPriceServiceProvider"
+    ],
+    "files": []
+}

@@ -1,0 +1,11 @@
+{
+    "name": "ClientReturn",
+    "alias": "clientreturn",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\ClientReturn\\Providers\\ClientReturnServiceProvider"
+    ],
+    "files": []
+}

@@ -1,0 +1,11 @@
+{
+    "name": "Temp",
+    "alias": "temp",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Temp\\Providers\\TempServiceProvider"
+    ],
+    "files": []
+}

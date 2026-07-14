@@ -1,0 +1,30 @@
+{
+    "name": "nwidart/productdiscount",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\ProductDiscount\\": "app/",
+            "Modules\\ProductDiscount\\Database\\Factories\\": "database/factories/",
+            "Modules\\ProductDiscount\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\ProductDiscount\\Tests\\": "tests/"
+        }
+    }
+}

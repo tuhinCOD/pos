@@ -1,0 +1,11 @@
+{
+    "name": "ProductReview",
+    "alias": "productreview",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\ProductReview\\Providers\\ProductReviewServiceProvider"
+    ],
+    "files": []
+}

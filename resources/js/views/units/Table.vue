@@ -1,0 +1,291 @@
+<template>
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <div class="page-item d-flex align-items-center me-1">
+                <label class="form-label mb-0 text-nowrap">Per page:</label>
+                <select class="form-select form-select-sm" style="width: auto;" :value="perPage" @change="emit('per-page-change', Number($event.target.value))">
+                    <option :value="5">5</option>
+                    <option :value="10">10</option>
+                    <option :value="15">15</option>
+                    <option :value="20">20</option>
+                    <option :value="25">25</option>
+                    <option :value="50">50</option>
+                </select>
+                <ExportButton v-if="exportEndpoint && auth.user?.role?.name !== 'super admin'" :endpoint="exportEndpoint" :filters="exportFilters" :asyncExport="true" @export-started="emit('export-started', $event)"/>
+            </div>
+        <div class="col-6">
+            <input
+                class="form-control"
+                type="text"
+                name="search"
+                placeholder="Search ..."
+                :value="search"
+                @input="emit('search', $event.target.value)"
+                @keyup.enter="emit('search-enter')"
+                @keyup.esc="emit('search-reset')"
+            />
+        </div>
+    </div>
+    <div class="table-responsive">
+        <div v-if="selectedCount" class="d-flex gap-2 mb-2 p-2 bg-light border rounded">
+            <span class="fw-bold small align-self-center">{{ selectedCount }} selected</span>
+            <button class="btn btn-sm btn-danger" @click="deleteSelected" v-if="auth.user?.role?.name !== 'super admin' && auth.user?.role?.name !== 'manager'">
+                <i class="bi bi-trash"></i> Delete
+            </button>
+            <button class="btn btn-sm btn-success" v-if="auth.user?.role?.name !== 'super admin'" @click="confirmExportSelected">
+                <i class="bi bi-file-earmark-excel-fill"></i> Excel
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" @click="clearSelection">Clear</button>
+        </div>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr class="text-center">
+                    <th class="col-checkbox">
+                        <input type="checkbox" :checked="allSelected" @change="toggleSelectAll" />
+                    </th>
+                    <th>Unit</th>
+                    <th class="col-1" v-if="auth.user?.role?.name !== 'super admin'">Action</th>
+                </tr>
+            </thead>
+            <tbody id="list" style="font-size: 12px;">
+                <tr v-for="unit in props.units" class="text-center align-middle">
+                    <td class="col-checkbox"><input type="checkbox" :checked="selectedIds.has(unit.id)" @change="toggleSelect(unit.id)" /></td>
+                    <td style="font-size: 12px;" class="text-start">
+                        <div class="about-unit">
+                            <div>
+                                <i class="bi bi-bag-fill"></i>
+                                Name: {{ unit.name || '-' }}
+                            </div>
+                            <div>
+                                <i class="bi bi-envelope-fill"></i>
+                                Description: {{ unit.description || '-' }}<br>
+                            </div>
+                            <div>
+                                <i class="bi bi-person-fill"></i>
+                                Created by: {{ unit.user?.name || '-' }}<br>
+                            </div>
+                            <div>
+                                <i class="bi bi-person-fill"></i>
+                                updated by: {{ unit.updated_by?.name || '-' }}<br>
+                            </div>
+                        </div>
+                    </td>
+                    <td v-if="auth.user?.role?.name !== 'super admin'">
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Basic mixed styles example">
+                            <button type="button" class="btn btn-warning edit-btn" @click="emit('edit-unit', unit)"><i class="bi bi-pencil-square"></i></button>
+                            <button v-if="auth.user?.role?.name !== 'super admin' && auth.user?.role?.name !== 'manager'" class="btn btn-danger delete-btn" @click="emit('delete-unit', unit.id)"><i class="bi bi-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+                <tr v-if="props.units.length === 0">
+                    <td colspan="4" class="text-center text-muted">
+                        No data available.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <nav aria-label="Page navigation">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="text-muted" style="font-size: 14px;">
+                {{ showingText }}
+            </div>
+            <li class="page-item d-flex align-items-center gap-2 ms-3" v-if="props.pagination?.last_page > 1">
+                <label class="form-label mb-0 text-nowrap" style="font-size: 13px;">Go to page:</label>
+                <input
+                    type="number"
+                    class="form-control form-control-sm"
+                    style="width: 70px;"
+                    :min="1"
+                    :max="props.pagination.last_page"
+                    v-model.number="jumpPage"
+                    @keyup.enter="goToPage"
+                />
+            </li>
+        </div>
+        <ul class="pagination justify-content-center m-0 mt-3" v-if="props.pagination?.last_page > 1">
+
+            <li class="page-item" :class="{ disabled: props.pagination.current_page === 1 }">
+                <button class="page-link" @click="emit('page-change', props.pagination.current_page - 1)">
+                    Previous
+                </button>
+            </li>
+
+            <li
+                v-for="page in pageNumbers"
+                :key="page + '-' + props.pagination.current_page"
+                class="page-item"
+                :class="{ active: page === props.pagination.current_page, disabled: page.toString().includes('ellipsis') }"
+            >
+                <button
+                    v-if="typeof page === 'number'"
+                    class="page-link"
+                    @click="emit('page-change', page)"
+                >
+                    {{ page }}
+                </button>
+                <span v-else class="page-link">&hellip;</span>
+            </li>
+
+            <li class="page-item" :class="{ disabled: props.pagination.current_page === props.pagination.last_page }">
+                <button class="page-link" @click="emit('page-change', props.pagination.current_page + 1)">
+                    Next
+                </button>
+            </li>
+        </ul>
+    </nav>
+
+</template>
+
+<script setup>
+    import { useAuth } from '../../stores/auth';
+    const auth = useAuth();
+    import ExportButton from '../../components/ExportButton.vue';
+    const props = defineProps({
+        units: { type: Array },
+        pagination: { type: Object },
+        search: { type: String},
+        perPage: { type: Number, default: 15 },
+        page: { type: Number, default: 1 },
+        exportEndpoint: { type: String, default: '' },
+        exportFilters: { type: Object, default: () => ({}) },
+    });
+
+    const emit = defineEmits([
+        'edit-unit',
+        'delete-unit',
+        'search',
+        'search-enter',
+        'search-reset',
+        'page-change',
+        'per-page-change',
+        'reload',
+        'export-started',
+    ]);
+
+    import { computed, ref, watch } from 'vue'
+    import axios from 'axios';
+
+    const selectedIds = ref(new Set());
+
+    const selectedCount = computed(() => selectedIds.value.size);
+
+    const allSelected = computed(() =>
+        props.units.length > 0 && props.units.every(item => selectedIds.value.has(item.id))
+    );
+
+    const exportSelectedUrl = computed(() => {
+        const ids = Array.from(selectedIds.value);
+        if (!ids.length) return '#';
+        return `/api/${props.exportEndpoint}/export?ids=${ids.join(',')}`;
+    });
+
+    const confirmExportSelected = async () => {
+        const ids = Array.from(selectedIds.value);
+        if (!ids.length) return;
+        if (confirm(`Are you sure you want to download ${ids.length} data?`)) {
+            try {
+                const res = await axios.get(`/api/${props.exportEndpoint}/export?ids=${ids.join(',')}`);
+                emit('export-started', res.data.file);
+            } catch (err) {
+                alert('Export failed');
+            }
+        }
+    };
+
+    const toggleSelectAll = () => {
+        if (allSelected.value) {
+            props.units.forEach(item => selectedIds.value.delete(item.id));
+            selectedIds.value = new Set(selectedIds.value);
+        } else {
+            const next = new Set(selectedIds.value);
+            props.units.forEach(item => next.add(item.id));
+            selectedIds.value = next;
+        }
+    };
+
+    const toggleSelect = (id) => {
+        const next = new Set(selectedIds.value);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        selectedIds.value = next;
+    };
+
+    const clearSelection = () => {
+        selectedIds.value = new Set();
+    };
+
+    const deleteSelected = async () => {
+        const ids = Array.from(selectedIds.value);
+        if (!ids.length) return;
+        if (!confirm(`Delete ${ids.length} item(s)?`)) return;
+        try {
+            await axios.post(`/api/${props.exportEndpoint}/delete-bulk`, { ids });
+            clearSelection();
+            emit('reload');
+        } catch {
+            alert('Failed to delete some items');
+        }
+    };
+
+    const jumpPage = ref(props.page);
+
+    watch(() => props.page, (val) => {
+        jumpPage.value = val
+    });
+
+    const goToPage = () => {
+        const p = Number(jumpPage.value)
+        if (p >= 1 && p <= (props.pagination?.last_page || 1)) {
+            emit('page-change', p)
+        }
+    };
+
+    const pageNumbers = computed(() => {
+        const pages = []
+        const last = props.pagination?.last_page || 0
+        const current = props.pagination?.current_page || 1
+
+        if (!last) return pages
+
+        let addedLeftEllipsis = false
+        let addedRightEllipsis = false
+
+        for (let i = 1; i <= last; i++) {
+            if (
+                i <= 2 || 
+                i > last - 2 || 
+                (i >= current - 1 && i <= current + 1)
+            ) {
+                pages.push(i)
+            } else if (i < current - 1 && !addedLeftEllipsis && i > 2) {
+                pages.push('left-ellipsis')
+                addedLeftEllipsis = true
+            } else if (i > current + 1 && !addedRightEllipsis && i < last - 1) {
+                pages.push('right-ellipsis')
+                addedRightEllipsis = true
+            }
+        }
+
+        return pages
+    })
+
+    const showingText = computed(() => {
+        const pagination = props.pagination || {}
+        if (!pagination.total || pagination.total === 0) return 'No units to show'
+
+        const from = pagination.from || 1
+        const to = pagination.to || pagination.data?.length || 0
+        const total = pagination.total || 0
+
+        return `Showing ${from} to ${to} of ${total} units`
+    })
+</script>
+
+<style lang="scss" scoped>
+.col-checkbox {
+    width: 1%;
+    white-space: nowrap;
+    text-align: center;
+    vertical-align: middle;
+}
+</style>

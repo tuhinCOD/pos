@@ -1,0 +1,11 @@
+{
+    "name": "ProductDiscount",
+    "alias": "productdiscount",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\ProductDiscount\\Providers\\ProductDiscountServiceProvider"
+    ],
+    "files": []
+}
