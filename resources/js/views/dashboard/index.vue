@@ -1,6 +1,6 @@
 <template>
     <div>
-        Inventory Page by tuhin
+        Inventory Page by tuhin vai
     </div>
 </template>
 
