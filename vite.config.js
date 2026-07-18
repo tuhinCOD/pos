@@ -4,7 +4,10 @@ import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 
 export default defineConfig({
-    base: '/',
+    build: {
+        outDir: 'public/build',
+        emptyOutDir: true,
+    },
     plugins: [
         laravel({
             input: ['resources/js/app.js'],
@@ -28,8 +31,12 @@ export default defineConfig({
         },
     },
     server: {
-        host: true,
-        port: 4000,
+        host: '0.0.0.0',
+        port: 5173,
+        hmr: {
+            host: '187.127.148.64',
+            port: 5173,
+        },
         watch: {
             ignored: ['**/storage/framework/views/**'],
         },
