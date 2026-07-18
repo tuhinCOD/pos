@@ -31,10 +31,6 @@
     "autoload": {
         "psr-4": {
             "App\\": "app/",
-            "Modules\\": "Modules/",
-
-            "Modules\\Barcode\\": "Modules/Barcode/app/",
-            "Modules\\Wishlist\\": "Modules/Wishlist/app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
         }
