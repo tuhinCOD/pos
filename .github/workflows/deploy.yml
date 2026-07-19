@@ -37,7 +37,7 @@ jobs:
             npm run build
 
             echo "===== Laravel ====="
-            composer dump-autoload -o
 
             php artisan optimize:clear
             php artisan optimize
+            composer dump-autoload
