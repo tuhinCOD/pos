@@ -24,11 +24,7 @@ jobs:
             echo "===== Reset Repository ====="
             git pull origin main
 
-            composer dump-autoload
-            php artisan optimize:clear
-            
-            echo "===== Install Composer Packages ====="
-            composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+            composer install
 
             echo "===== Generate Autoload ====="
             composer dump-autoload
