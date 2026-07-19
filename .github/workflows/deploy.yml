@@ -23,8 +23,9 @@ jobs:
 
             echo "===== Reset Repository ====="
             git pull origin main
-
-            composer install
+            
+            echo "===== Install Composer Packages ====="
+            composer install --no-dev --no-interaction --prefer-dist
 
             echo "===== Generate Autoload ====="
             composer dump-autoload
