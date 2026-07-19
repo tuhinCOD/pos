@@ -25,9 +25,9 @@ jobs:
 
             composer dump-autoload
 
-            php artisan optimize:clear
-
             composer install --no-interaction --prefer-dist --optimize-autoloader
+
+            php artisan optimize:clear
 
             npm install
 
