@@ -21,39 +21,32 @@ jobs:
 
             cd /var/www/pos
 
-            echo "===== Current Directory ====="
-            pwd
-
-            echo "===== Current User ====="
-            whoami
-
             echo "===== Reset Repository ====="
             git fetch origin
             git reset --hard origin/main
             git clean -fd
 
-            echo "===== Composer Install ====="
+            echo "===== Install Composer Packages ====="
             composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
-            echo "===== Composer Autoload ====="
+            echo "===== Generate Autoload ====="
             composer dump-autoload
 
-            echo "===== Node Build ====="
+            echo "===== Install Node Packages ====="
             npm ci
+
+            echo "===== Build Assets ====="
             npm run build
 
             echo "===== Laravel ====="
             php artisan optimize:clear
             php artisan migrate --force
-
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
 
             php artisan queue:restart
 
-            echo "===== Restart Services ====="
+            echo "===== Reload Services ====="
             systemctl reload php8.3-fpm
             systemctl reload nginx
-
-            echo "===== Deployment Complete ====="
