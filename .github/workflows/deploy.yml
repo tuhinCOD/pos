@@ -17,28 +17,34 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            export COMPOSER_ALLOW_SUPERUSER=1
+            set -e
 
             cd /var/www/pos
 
-            echo "===== Reset Repository ====="
-            git fetch origin
-            git reset --hard origin/main
-            git clean -fd
+            git pull origin main
 
-            echo "===== Composer ====="
+            composer dump-autoload
+
             composer install --no-interaction --prefer-dist --optimize-autoloader
 
-            echo "===== Dump Autoload ====="
-            composer dump-autoload -o
+            php artisan optimize:clear
 
-            echo "===== Build ====="
-            npm ci
+            npm install
+
             npm run build
 
-            echo "===== Laravel ====="
+            php artisan config:clear
+
+            php artisan route:clear
+
+            php artisan view:clear
+
+            php artisan config:cache
+
+            php artisan route:cache
+
+            php artisan view:cache
+
             php artisan migrate --force
-            php artisan optimize:clear
-            php artisan optimize
 
             php artisan queue:restart
