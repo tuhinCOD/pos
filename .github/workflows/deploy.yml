@@ -22,15 +22,17 @@ jobs:
             cd /var/www/pos
 
             echo "===== Reset Repository ====="
-            git fetch origin
-            git reset --hard origin/main
-            git clean -fd
+            git pull origin main
 
+            composer dump-autoload
+            php artisan optimize:clear
+            
             echo "===== Install Composer Packages ====="
             composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
             echo "===== Generate Autoload ====="
             composer dump-autoload
+            php artisan optimize:clear
 
             echo "===== Install Node Packages ====="
             npm ci
