@@ -28,8 +28,6 @@ jobs:
             composer install --no-dev --no-interaction --prefer-dist
 
             echo "===== Generate Autoload ====="
-            composer dump-autoload
-            php artisan optimize:clear
 
             echo "===== Install Node Packages ====="
             npm ci
@@ -43,6 +41,8 @@ jobs:
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
+            composer dump-autoload
+            php artisan optimize:clear
 
             php artisan queue:restart
 
