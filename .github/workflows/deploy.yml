@@ -37,8 +37,7 @@ jobs:
             npm run build
 
             echo "===== Laravel ====="
-            php artisan migrate --force
+            composer dump-autoload
+
             php artisan optimize:clear
             php artisan optimize
-
-            php artisan queue:restart
