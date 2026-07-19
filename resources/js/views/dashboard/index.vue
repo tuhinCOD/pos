@@ -1,6 +1,6 @@
 <template>
     <div>
-        powered by tuhin vai
+        powered by tuhin
     </div>
 </template>
 
